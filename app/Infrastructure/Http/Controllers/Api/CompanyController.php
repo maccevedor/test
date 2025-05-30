@@ -49,14 +49,21 @@ class CompanyController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        // TODO: Use Form Request for validation
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), (new \App\Infrastructure\Http\Requests\StoreCompanyRequest())->rules());
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         $command = new \App\Application\DTOs\RegisterCompanyCommand(
             name: $request->input('name')
         );
 
         $companyDto = $this->registerCompany->execute($command);
 
-        // TODO: Use CompanyResource for response
         return response()->json($companyDto, 201);
     }
 
@@ -79,7 +86,17 @@ class CompanyController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        // TODO: Use Form Request for validation
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255', 'unique:companies,name,' . $id]
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         $command = new \App\Application\DTOs\UpdateCompanyCommand(
             id: $id,
             name: $request->input('name')
@@ -87,7 +104,6 @@ class CompanyController extends Controller
 
         try {
             $companyDto = $this->updateCompany->execute($command);
-            // TODO: Use CompanyResource for response
             return response()->json($companyDto);
         } catch (\DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 404);
