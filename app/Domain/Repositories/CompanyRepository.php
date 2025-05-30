@@ -8,7 +8,7 @@ interface CompanyRepository
 {
     public function findById(int $id): ?Company;
 
-    public function save(Company $company): void;
+    public function save(Company $company): Company;
 
     public function delete(Company $company): void;
 

@@ -2,9 +2,11 @@
 
     namespace App\Infrastructure\Persistence\Eloquent;
 
-    use App\Domain\Repositories\CompanyRepository;
-    use App\Domain\Aggregates\Company as DomainCompany; // Alias for clarity
-    use App\Models\Company as EloquentCompany; // Alias for clarity
+use App\Domain\Repositories\CompanyRepository;
+use App\Domain\Aggregates\Company as DomainCompany;
+use App\Models\Company as EloquentCompany;
+use Illuminate\Support\Collection;
+use Carbon\Carbon;
 
     class EloquentCompanyRepository implements CompanyRepository
     {
@@ -27,21 +29,29 @@
             return $this->mapEloquentToDomain($eloquentCompany);
         }
 
-        public function save(DomainCompany $company): void // Matching the interface signature
-        {
-            // Map Domain Aggregate to Eloquent model
-            $eloquentCompany = EloquentCompany::find($company->getId()); // Assuming getId() exists on DomainCompany
+    public function save(DomainCompany $company): DomainCompany // Ensure return type is DomainCompany
+    {
+        $eloquentCompany = $company->getId() ? EloquentCompany::find($company->getId()) : new EloquentCompany();
 
-            if (!$eloquentCompany) {
-                $eloquentCompany = new EloquentCompany();
-            }
+        $eloquentCompany->name = $company->getName();
+        // ... map other properties from DomainCompany to EloquentCompany
 
-            // Populate Eloquent model from Domain Aggregate
-            $eloquentCompany->name = $company->getName(); // Assuming getName() exists on DomainCompany
-            // ... map other properties
-
-            $eloquentCompany->save();
+        try {
+            $eloquentCompany->save(); // Attempt to save
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            logger()->error('Error saving company: ' . $e->getMessage(), ['exception' => $e]);
+            // Re-throw the exception or handle it as appropriate for your application
+            throw $e;
         }
+
+
+        // Set the ID and timestamps back on the DomainCompany aggregate
+        $company->setId($eloquentCompany->id);
+        $company->setTimestamps($eloquentCompany->created_at, $eloquentCompany->updated_at);
+
+        return $company; // *** CRITICAL: Ensure this line is present and returns $company ***
+    }
 
     // Method to map Eloquent model to Domain Aggregate
         private function mapEloquentToDomain(EloquentCompany $eloquentCompany): DomainCompany
