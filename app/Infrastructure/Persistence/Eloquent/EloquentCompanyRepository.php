@@ -43,27 +43,26 @@
             $eloquentCompany->save();
         }
 
-        // Method to map Eloquent model to Domain Aggregate
+    // Method to map Eloquent model to Domain Aggregate
         private function mapEloquentToDomain(EloquentCompany $eloquentCompany): DomainCompany
         {
-            // Implement the mapping logic here
-            // Create a new DomainCompany instance and populate its properties from the Eloquent model
             return new DomainCompany(
                 $eloquentCompany->id,
-                $eloquentCompany->name
-                // ... map other properties
+                $eloquentCompany->name,
+                $eloquentCompany->created_at, // Map created_at
+                $eloquentCompany->updated_at // Map updated_at
             );
         }
 
         public function findAll(): array
         {
             $eloquentCompanies = EloquentCompany::all();
-    
+
             return $eloquentCompanies->map(function (EloquentCompany $eloquentCompany) {
                 return $this->mapEloquentToDomain($eloquentCompany); // Returns DomainCompany objects
             })->all(); // This converts the collection to an array
         }
-    
+
         public function delete(DomainCompany $company): void
         {
         $eloquentCompany = EloquentCompany::find($company->getId()); // Assuming getId() exists
@@ -74,7 +73,7 @@
         // Optionally, handle the case where the company is not found if needed
         }
 
-        
+
 
         // ... other methods
     }
