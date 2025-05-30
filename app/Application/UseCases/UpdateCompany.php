@@ -23,15 +23,22 @@ class UpdateCompany
             throw new \DomainException('Company not found.');
         }
 
-        $company->name = $command->name;
-        $this->companyRepository->save($company);
+        // Create a new Company instance with the updated name
+        $updatedCompany = new \App\Domain\Aggregates\Company(
+            $company->getId(),
+            $command->name,
+            $company->getCreatedAt(),
+            $company->getUpdatedAt()
+        );
+        
+        $this->companyRepository->save($updatedCompany);
 
-        // Return a CompanyDto
+        // Return a CompanyDto with the updated company data
         return new CompanyDto(
-            $company->id,
-            $company->name,
-            $company->created_at,
-            $company->updated_at
+            $updatedCompany->getId(),
+            $updatedCompany->getName(),
+            $updatedCompany->getCreatedAt(),
+            $updatedCompany->getUpdatedAt()
         );
     }
 }
