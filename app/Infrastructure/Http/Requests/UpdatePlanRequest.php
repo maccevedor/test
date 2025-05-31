@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePlanRequest extends FormRequest
 {
@@ -22,10 +23,18 @@ class UpdatePlanRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the plan ID from the route parameters
+        $planId = $this->route('plan'); // Assuming your route parameter is named 'plan'
+
         return [
-            'name' => 'sometimes|required|string|max:255|unique:plans,name,' . $this->route('plan'),
-            'price' => 'sometimes|required|numeric|min:0',
-            'user_limit' => 'sometimes|required|integer|min:0',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('plans', 'name')->ignore($planId), // Ignore the current plan's ID
+            ],
+            'price' => ['required', 'numeric', 'min:0'],
+            'user_limit' => ['required', 'integer', 'min:0'],
             'features' => 'nullable|json',
         ];
     }

@@ -19,9 +19,8 @@ class CompanyUserResource extends JsonResource
             'company_id' => $this->company_id,
             'name' => $this->name,
             'email' => $this->email,
-            // You can add other relevant fields here if needed
-            // 'created_at' => $this->created_at,
-            // 'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

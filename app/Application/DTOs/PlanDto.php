@@ -2,24 +2,27 @@
 
 namespace App\Application\DTOs;
 
+use App\Domain\Entities\Plan;
+use Carbon\Carbon;
+
 class PlanDto
 {
-    public int $id;
+    public ?int $id;
     public string $name;
     public float $price;
     public int $user_limit;
     public ?array $features;
-    public string $created_at;
-    public string $updated_at;
+    public ?Carbon $created_at;
+    public ?Carbon $updated_at;
 
     public function __construct(
-        int $id,
+        ?int $id,
         string $name,
         float $price,
         int $user_limit,
         ?array $features,
-        string $created_at,
-        string $updated_at
+        ?Carbon $created_at,
+        ?Carbon $updated_at
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -28,5 +31,18 @@ class PlanDto
         $this->features = $features;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
+    }
+
+    public static function fromEntity(Plan $plan): self
+    {
+        return new self(
+            $plan->getId(),
+            $plan->getName(),
+            $plan->getPrice(),
+            $plan->getUserLimit(),
+            $plan->getFeatures(),
+            $plan->getCreatedAt(),
+            $plan->getUpdatedAt()
+        );
     }
 }

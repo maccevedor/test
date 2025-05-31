@@ -24,7 +24,7 @@ class StorePlanRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', 'unique:plans,name'],
             'price' => ['required', 'numeric', 'min:0'],
-            'user_limit' => ['required', 'integer', 'min:1'],
+            'user_limit' => ['required', 'integer', 'min:0'],
             'features' => ['nullable', 'json'],
         ];
     }

@@ -25,14 +25,7 @@ class GetPlan
             throw new PlanNotFoundException("Plan with ID {$planId} not found.");
         }
 
-        return new PlanDto(
-            $plan->id,
-            $plan->name,
-            $plan->price,
-            $plan->user_limit,
-            $plan->features,
-            $plan->created_at,
-            $plan->updated_at
-        );
+        // Assuming PlanDto has a fromEntity method
+        return PlanDto::fromEntity($plan);
     }
 }

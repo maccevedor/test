@@ -2,8 +2,8 @@
 
 namespace App\Infrastructure\Persistence\Eloquent;
 
-use App\Domain\Repositories\PlanRepository;
-use App\Infrastructure\Persistence\Eloquent\Plan as EloquentPlan; // Alias Eloquent model to avoid naming conflicts
+use App\Domain\Repositories\PlanRepository; // Correct namespace for the PlanRepository interface
+use App\Models\Plan as EloquentPlan; // Correct namespace for the Eloquent model
 use App\Domain\Aggregates\Plan; // Assuming you have a Domain Plan aggregate
 
 class EloquentPlanRepository implements PlanRepository
@@ -15,7 +15,7 @@ class EloquentPlanRepository implements PlanRepository
         $this->model = $model;
     }
 
-    public function findById(string $id): ?Plan
+    public function findById(int $id): ?Plan // Change type hint to int
     {
         $eloquentPlan = $this->model->find($id);
 
@@ -27,7 +27,7 @@ class EloquentPlanRepository implements PlanRepository
         return $this->mapEloquentToDomain($eloquentPlan);
     }
 
-    public function save(Plan $plan): void
+    public function save(Plan $plan): Plan // Change return type to Plan
     {
         $eloquentPlan = $this->model->find($plan->getId());
 
@@ -40,6 +40,10 @@ class EloquentPlanRepository implements PlanRepository
 
         $eloquentPlan->save();
     }
+    
+    // After saving, update the domain entity with the generated ID and timestamps
+    $plan->setId($eloquentPlan->id);
+    $plan->setTimestamps($eloquentPlan->created_at, $eloquentPlan->updated_at);
 
     public function delete(Plan $plan): void
     {

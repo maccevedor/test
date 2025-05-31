@@ -3,8 +3,8 @@
 namespace App\Application\UseCases;
 
 use App\Application\DTOs\CancelCompanySubscriptionCommand;
-use App\Domain\Entities\Subscription; // Assuming you have a Subscription entity
 use App\Domain\Repositories\SubscriptionRepository;
+use App\Domain\Exceptions\SubscriptionNotFoundException;
 
 class CancelCompanySubscription
 {
@@ -19,11 +19,15 @@ class CancelCompanySubscription
     {
         $subscription = $this->subscriptionRepository->findActiveByCompanyId($command->company_id);
 
+        // Throw SubscriptionNotFoundException if no active subscription is found
         if (!$subscription) {
-            throw new \Exception('Active subscription not found for this company.');
+            throw new SubscriptionNotFoundException('Active subscription not found for this company.');
         }
 
-        $subscription->status = 'cancelled';
+        // Assuming your Subscription entity has a method to cancel the subscription
+        // This encapsulates the domain logic within the entity
+        $subscription->cancel($command->end_date);
+
         $subscription->end_date = $command->end_date;
 
         $this->subscriptionRepository->save($subscription);

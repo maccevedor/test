@@ -4,8 +4,9 @@ namespace App\Application\UseCases;
 
 use App\Application\DTOs\UpdatePlanCommand;
 use App\Application\DTOs\PlanDto;
-use App\Application\DTOs\PlanDto;
 use App\Domain\Repositories\PlanRepository;
+use App\Domain\Exceptions\PlanNotFoundException;
+use App\Domain\Entities\Plan;
 
 class UpdatePlan
 {
@@ -22,16 +23,17 @@ class UpdatePlan
         $plan = $this->planRepository->findById($command->id);
 
         if (!$plan) {
-            throw new \Exception("Plan not found."); // Or a more specific custom exception
+            throw new PlanNotFoundException("Plan with ID {$command->id} not found.");
         }
 
-        $plan->name = $command->name;
-        $plan->price = $command->price;
-        $plan->user_limit = $command->user_limit;
-        $plan->features = $command->features;
+        // Assuming Plan entity has setter methods (recommended) or public properties
+        $plan->setName($command->name);
+        $plan->setPrice($command->price);
+        $plan->setUserLimit($command->user_limit);
+        $plan->setFeatures($command->features);
 
-        $this->planRepository->save($plan);
+        $persistedPlan = $this->planRepository->save($plan);
 
-        return new PlanDto($plan->id, $plan->name, $plan->price, $plan->user_limit, $plan->features, $plan->created_at, $plan->updated_at);
+        return PlanDto::fromEntity($persistedPlan);
     }
 }

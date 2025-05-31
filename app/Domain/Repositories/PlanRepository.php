@@ -2,7 +2,7 @@
 
 namespace App\Domain\Repositories;
 
-use App\Domain\Aggregates\Plan;
+use App\Domain\Entities\Plan;
 
 interface PlanRepository
 {
@@ -25,9 +25,9 @@ interface PlanRepository
      * Save a Plan entity.
      *
      * @param Plan $plan
-     * @return void
+     * @return Plan
      */
-    public function save(Plan $plan): void;
+    public function save(Plan $plan): Plan;
 
     /**
      * Delete a Plan entity.

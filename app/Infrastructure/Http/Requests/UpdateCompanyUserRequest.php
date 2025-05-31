@@ -29,17 +29,19 @@ class UpdateCompanyUserRequest extends FormRequest
         $companyId = $this->route('company');
 
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => [
-                'sometimes',
+                'required',
                 'string',
                 'email',
                 'max:255',
+                // Ensure email is unique within the scope of the company, excluding the current user's email.
                 Rule::unique('company_users')->ignore($userId)->where(function ($query) use ($companyId) {
                     return $query->where('company_id', $companyId);
                 }),
             ],
-            'password' => ['sometimes', 'nullable', 'string', 'min:8'],
+            // Password is nullable and not required for update if not provided.
+            'password' => ['nullable', 'string', 'min:8'],
         ];
     }
 }

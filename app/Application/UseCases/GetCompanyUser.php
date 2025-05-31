@@ -20,16 +20,9 @@ class GetCompanyUser
         $companyUser = $this->companyUserRepository->findByIdAndCompany($userId, $companyId);
         
         if (!$companyUser) {
-            return null;
-        }
+ throw new CompanyUserNotFoundException("Company User with ID {$userId} not found for Company ID {$companyId}.");
+ }
 
-        return new CompanyUserDto(
-            $companyUser->id,
-            $companyUser->company_id,
-            $companyUser->name,
-            $companyUser->email,
-            $companyUser->created_at,
-            $companyUser->updated_at
-        );
+ return CompanyUserDto::fromEntity($companyUser);
     }
 }

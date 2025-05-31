@@ -2,7 +2,9 @@
 
 namespace App\Application\UseCases;
 
+use App\Domain\Entities\Plan;
 use App\Domain\Repositories\PlanRepository;
+use App\Domain\Exceptions\PlanNotFoundException;
 
 class DeletePlan
 {
@@ -17,7 +19,7 @@ class DeletePlan
     {
         $plan = $this->planRepository->findById($planId);
         if (!$plan) {
-            throw new \Exception('Plan not found'); // Example: throw an exception
+            throw new PlanNotFoundException("Plan with ID {$planId} not found.");
         }
         $this->planRepository->delete($plan);
     }

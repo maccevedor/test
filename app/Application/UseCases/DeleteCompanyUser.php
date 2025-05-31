@@ -19,7 +19,7 @@ class DeleteCompanyUser
     {
         $user = $this->companyUserRepository->findById($command->getId());
 
-        if (!$user || $user->company_id !== $command->getCompanyId()) {
+        if (!$user || $user->getCompanyId() !== $command->getCompanyId()) {
             throw new CompanyUserNotFoundException("Company user with ID {$command->getId()} not found or does not belong to company {$command->getCompanyId()}.");
         }
 

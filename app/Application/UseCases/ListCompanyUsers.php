@@ -9,10 +9,8 @@ use App\Application\DTOs\CompanyUserDto;
 
 class ListCompanyUsers
 {
-    private $companyUserRepository;
-
-    public function __construct(CompanyUserRepository $companyUserRepository)
-    {    private $companyRepository;
+ private $companyRepository;
+ private $companyUserRepository;
 
     public function __construct(CompanyRepository $companyRepository, CompanyUserRepository $companyUserRepository)
     {
@@ -22,15 +20,17 @@ class ListCompanyUsers
 
     public function execute(int $companyId): array
     {
-        $company = $this->companyRepository->findById($companyId);
+ $company = $this->companyRepository->findById($companyId);
 
-    public function execute(int $companyId): array
-    {
-        $companyUsers = $this->companyUserRepository->findByCompanyId($companyId);
+        if (!$company) {
+            throw new CompanyNotFoundException("Company with ID {$companyId} not found.");
+        }
 
-        $companyUserDtos = [];
-        foreach ($companyUsers as $companyUser) {
-            $companyUserDtos[] = new CompanyUserDto(
+ $companyUsers = $this->companyUserRepository->findByCompanyId($companyId);
+
+ $companyUserDtos = [];
+ foreach ($companyUsers as $companyUser) {
+ $companyUserDtos[] = new CompanyUserDto(
                 $companyUser->id,
                 $companyUser->company_id,
                 $companyUser->name,

@@ -6,6 +6,9 @@ use App\Application\DTOs\SubscribeCompanyToPlanCommand;
 use App\Domain\Repositories\CompanyRepository;
 use App\Domain\Repositories\PlanRepository;
 use App\Domain\Entities\Subscription;
+use App\Domain\Exceptions\CompanyNotFoundException;
+use App\Domain\Exceptions\PlanNotFoundException;
+use App\Domain\Exceptions\SubscriptionAlreadyActiveException;
 use App\Domain\Repositories\SubscriptionRepository;
 
 class SubscribeCompanyToPlan
@@ -27,16 +30,22 @@ class SubscribeCompanyToPlan
     public function execute(SubscribeCompanyToPlanCommand $command): void
     {
         $company = $this->companyRepository->findById($command->company_id);
-        if (!$company) {
-            throw new \DomainException('Company not found.');
+        if (null === $company) {
+            throw new CompanyNotFoundException("Company with ID {$command->company_id} not found.");
         }
 
         $plan = $this->planRepository->findById($command->plan_id);
-        if (!$plan) {
-            throw new \DomainException('Plan not found.');
+        if (null === $plan) {
+            throw new PlanNotFoundException("Plan with ID {$command->plan_id} not found.");
         }
 
-        $subscription = new Subscription($company->id, $plan->id, $command->start_date, null, 'active');
+        // Check if the company already has an active subscription
+        $activeSubscription = $this->subscriptionRepository->findActiveByCompanyId($command->company_id);
+        if (null !== $activeSubscription) {
+            throw new SubscriptionAlreadyActiveException("Company with ID {$command->company_id} already has an active subscription.");
+        }
+
+        $subscription = new Subscription(null, $company->getId(), $plan->getId(), $command->start_date, null, 'active');
 
         $this->subscriptionRepository->save($subscription);
     }

@@ -16,7 +16,9 @@ class ListPlans
 
     public function execute(): array
     {
-        // TODO: Implement execute() method to list all plans using PlanRepository
-        return []; // Placeholder
+        $plans = $this->planRepository->findAll();
+
+        // Map each Plan entity to a PlanDto
+        return $plans->map(fn($plan) => PlanDto::fromEntity($plan))->all();
     }
 }

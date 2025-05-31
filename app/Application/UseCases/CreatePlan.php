@@ -18,23 +18,22 @@ class CreatePlan
 
     public function execute(CreatePlanCommand $command): PlanDto
     {
+        // Create a new Plan Entity instance using its constructor.
+        // ID and timestamps are null initially as it's a new entity.
         $plan = new Plan(
+            null, // ID is null for a new entity
             $command->name,
             $command->price,
             $command->user_limit,
-            $command->features
+            $command->features,
+            null, // created_at is null for a new entity
+            null  // updated_at is null for a new entity
         );
 
+        // Use the Repository to save the Plan Entity and get the persisted entity back (with ID and timestamps).
         $createdPlan = $this->planRepository->save($plan);
 
-        return new PlanDto(
-            $createdPlan->getId(),
-            $createdPlan->getName(),
-            $createdPlan->getPrice(),
-            $createdPlan->getUserLimit(),
-            $createdPlan->getFeatures(),
-            $createdPlan->getCreatedAt(),
-            $createdPlan->getUpdatedAt()
-        );
+        // Return a PlanDto created from the persisted Plan Entity.
+        return PlanDto::fromEntity($createdPlan);
     }
 }

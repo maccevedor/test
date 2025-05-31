@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Application\UseCases;
-
+use Illuminate\Support\Facades\Hash;
 use App\Application\DTOs\UpdateCompanyUserCommand;
 use App\Application\Exceptions\CompanyUserNotFoundException;
 use App\Application\DTOs\CompanyUserDto;
@@ -18,7 +18,10 @@ class UpdateCompanyUser
 
     public function execute(UpdateCompanyUserCommand $command): CompanyUserDto
     {
-        // Find the company user by ID and company ID
+        // Find the company user by ID
+        $companyUser = $this->companyUserRepository->findById($command->id);
+
+        // Check if the user exists and belongs to the company
         $companyUser = $this->companyUserRepository->findByIdAndCompanyId($command->id, $command->company_id);
 
         if (!$companyUser) {
@@ -31,21 +34,12 @@ class UpdateCompanyUser
 
         // Only update password if it's provided in the command
         if ($command->password !== null) {
-            // Hash the password before saving (implementation depends on your hashing strategy)
-            $companyUser->password = bcrypt($command->password); // Example hashing
+            $companyUser->password = Hash::make($command->password);
         }
 
         // Save the updated company user
         $this->companyUserRepository->save($companyUser);
 
-        // Return the updated company user as a DTO
-        return new CompanyUserDto(
-            $companyUser->id,
-            $companyUser->company_id,
-            $companyUser->name,
-            $companyUser->email,
-            $companyUser->created_at,
-            $companyUser->updated_at
-        );
+        return CompanyUserDto::fromEntity($companyUser);
     }
 }
