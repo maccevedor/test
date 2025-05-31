@@ -16,4 +16,14 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    /**
+     * A basic test example.
+     */
+    public function test_company_get(): void
+    {
+        $response = $this->get('/api/companies');
+
+        $response->assertStatus(200);
+    }
 }
